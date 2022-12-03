@@ -1,5 +1,7 @@
 import os
 import datetime
+import random
+
 from flask import Flask, render_template, redirect, request, abort, jsonify
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from sqlalchemy import desc
@@ -7,11 +9,11 @@ from sqlalchemy import desc
 from data import db_session, call_resource
 from data.proposals import Proposal
 from data.users import User
-from forms.addcallform import AddCallForm
+from forms.addproposalform import AddProposalForm
 from forms.editcallform import EditCallForm
-from forms.edituserform import EditUserForm
+from forms.textratingform import TextRatingForm
+from forms.videoratingform import VideoRatingForm
 from forms.loginform import LoginForm
-from forms.registerform import RegisterForm
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'abcdef'
@@ -26,6 +28,16 @@ def load_user(user_id):  # find user in database
     return db_sess.query(User).get(user_id)
 
 
+
+
+
+
+def get_proposal(proposal_id):
+    db_sess = db_session.create_session()
+    curr_proposal = db_sess.query(Proposal).filter(Proposal.id == proposal_id).first()
+    #db_sess.expunge_all()
+    return curr_proposal
+
 @app.errorhandler(404)
 def not_found(error):  # Error 404
     return render_template('404.html', title='Страница не найдена'), 404
@@ -34,83 +46,6 @@ def not_found(error):  # Error 404
 @app.errorhandler(401)
 def unauthorized_access(error):  # Access error
     return redirect('/login')
-
-
-"""Серёжа, подумай, нам нужна регистрация, если нет, то удаляй её
-↓
-"""
-
-
-@app.route('/new_proposal', methods=['GET', 'POST'])
-def register():
-    form = RegisterForm()
-    if form.validate_on_submit():
-        if form.password.data != form.password_again.data:
-            return render_template('register.html', title='Регистрация',
-                                   form=form,
-                                   message="Пароли не совпадают")
-        db_sess = db_session.create_session()
-        if db_sess.query(User).filter(User.email == form.email.data).first():
-            return render_template('register.html', title='Регистрация',
-                                   form=form,
-                                   message="Такой пользователь уже есть")
-        user = User(
-            name=form.name.data,
-            surname=form.surname.data,
-            position=form.position.data,
-            email=form.email.data
-        )
-        user.set_password(form.password.data)
-        db_sess.add(user)
-        db_sess.commit()
-        return redirect('/login')
-    return render_template('register.html', title='Регистрация', form=form)
-
-
-"""
-Это я не помню где вообще было, вроде бы нигде
-↓
-"""
-
-
-@app.route('/users/<int:id>', methods=['GET', 'POST'])
-@login_required
-def edit_user(id):
-    form = EditUserForm()
-    if request.method == "GET":
-        db_sess = db_session.create_session()
-        user = db_sess.query(User).filter(User.id == id).first()
-        if user:
-            form.email.data = user.email
-            form.name.data = user.name
-            form.surname.data = user.surname
-            form.locality.data = user.locality
-            form.position.data = user.position
-        else:
-            abort(404)
-    if form.validate_on_submit():
-        if form.password.data != form.password_again.data:
-            return render_template('edit_user.html', title='Профиль оператора',
-                                   form=form,
-                                   message="Пароли не совпадают")
-        db_sess = db_session.create_session()
-        if db_sess.query(User).filter(User.email == form.email.data, User.id != id).first():
-            return render_template('edit_user.html', title='Профиль оператора',
-                                   form=form,
-                                   message="Такой пользователь уже есть")
-        user = db_sess.query(User).filter(User.id == id).first()
-        if user:
-            user.email = form.email.data
-            user.name = form.name.data
-            user.surname = form.surname.data
-            user.locality = form.locality.data
-            user.position = form.position.data
-            user.set_password(form.password.data)
-            db_sess.commit()
-            return redirect('/login')
-        else:
-            abort(404)
-    return render_template('edit_user.html', title='Профиль оператора', form=form)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -136,101 +71,86 @@ def logout():  # exit
 
 
 @app.route('/')
-def index():  # main page
-    db_sess = db_session.create_session()
-    calls = db_sess.query(Proposal).filter(Proposal.status != 'finished').all()
-    db_sess.commit()
+def index():
+    """Запуск основой страцицы"""
     return render_template('main.html')
 
 
 @app.route('/add_proposal', methods=['GET', 'POST'])
-@login_required
 def add_proposal():  # new proposal
-    form = AddCallForm()
+    """Добавление заявки в БД"""
+    form = AddProposalForm()
     if form.validate_on_submit():
         db_sess = db_session.create_session()
-        call = Proposal()
-        call.message = form.message.data
-        call.address = form.address.data
-        call.recognize_call()
-        db_sess.add(call)
+        new_proposal = Proposal()
+
+        proposal_id = random.randint(100,1000)# создание рандомного id
+        # заполнение пустой заявки данными из формы
+        new_proposal.make_proposal(proposal_id ,form.type.data, form.file.data, form.user_data)
+
+        # добавление заявки в БД
+        db_sess.add(new_proposal)
         db_sess.commit()
-        return redirect('/calls')
-    return render_template('add_proposal.html', title='Новый вызов',
-                           form=form)
+        return redirect("/proposals")
+    return render_template('add_proposal.html',form=form)
 
 
-@app.route('/proposals/<int:call_id>', methods=['GET', 'POST'])
+
+""" Оценка заявок экспертами """
+@app.route('/proposals/rate/<int:proposal_id>', methods=['GET', 'POST'])
 @login_required
-def edit_proposal(call_id):  # edit existing proposal (i.e., edit grading)
-    form = EditCallForm()
-    if request.method == "GET":
-        db_sess = db_session.create_session()
-        proposal = db_sess.query(Proposal).filter(Proposal.id == call_id).first()
-        if proposal:
-            form.message.data = proposal.message
-            form.address.data = proposal.address
-            form.service.data = proposal.service
-            form.status.data = proposal.status
-            form.answer.data = proposal.answer
-            form.call_id.data = proposal.id
-            form.call_time.data = proposal.call_time
-            form.finish_time.data = proposal.finish_time
-            if proposal.point:
-                x, y = proposal.point.split()
-                form.point.data = f"{x},{y}"
-        else:
-            abort(404)
+def eval_proposal(proposal_id): # Оценивание заявок экспертами
+    db_sess = db_session.create_session()
+    current_proposal = db_sess.query(Proposal).filter(Proposal.id == proposal_id).first()
+    if current_proposal.type == "text":
+        form = TextRatingForm()
+    else:
+        form = VideoRatingForm()
+
     if form.validate_on_submit():
-        db_sess = db_session.create_session()
-        proposal = db_sess.query(Proposal).filter(Proposal.id == call_id).first()
-        if proposal:
-            proposal.message = form.message.data
-            proposal.service = form.service.data
-            proposal.answer = form.answer.data
-            proposal.change_address(form.address.data)
-            proposal.change_status(form.status.data)
-            db_sess.commit()
-            return redirect('/calls')
-        else:
-            abort(404)
-    return render_template('edit_proposal.html',
-                           title='Редактирование вызова',
-                           form=form)
+        ratings = form.get_text_rating if current_proposal.type == 'text' else form.get_video_rating
+        lowering_ratings = form.get_lowering_rating
+        current_proposal.verify_proposal(ratings,lowering_ratings,'verified')
+        db_sess.commit()
+        return redirect("/proposals")
+    return render_template("evaluate_proposal.html",proposal=current_proposal,form=form)
+
+@app.route('/proposals/view/<int:proposal_id>', methods=['GET', 'POST'])
+def view_proposal(proposal_id):
+    proposal = get_proposal(proposal_id)
+    return render_template('view_proposal.html',proposal=proposal)
+
 
 
 @app.route('/proposals')
-@login_required
 def proposals():
     db_sess = db_session.create_session()
-    calls = db_sess.query(Proposal).order_by(desc(Proposal.call_time)).all()
+    proposals = db_sess.query(Proposal).all()#.filter(Proposal.status == 'verified').all()
     db_sess.commit()
-    return render_template('proposals.html', calls=calls, time_now=datetime.datetime.today())
+    return render_template('proposals.html', proposals=proposals)
 
 
-@app.route('/delete_proposal/<int:call_id>', methods=['GET', 'POST'])
+@app.route('/delete_proposal/<int:proposal_id>', methods=['GET', 'POST'])
 @login_required
-def delete_proposal(call_id):  # delete proposal (e.g. copy of someone's work)
+def delete_proposal(proposal_id):
+    """Удаление заявки из БД
+        Только для админов"""
     db_sess = db_session.create_session()
-    call = db_sess.query(Proposal).filter(Proposal.id == call_id).first()
-    if call:
-        db_sess.delete(call)
+    proposal = db_sess.query(Proposal).filter(Proposal.id == proposal_id).first()
+    if proposal:
+        db_sess.delete(proposal)
         db_sess.commit()
     else:
         abort(404)
-    return redirect('/calls')
+    return redirect('/proposals')
 
 
-# def add_proposal():
-# return call_process()
 
-"""Сейчас не заработает из-за ошибок в полях с адресом"""
-@app.route('/proposals/post', methods=['POST'])
 def main():  # run program
-    db_session.global_init("emergency.db")
+    db_session.global_init("main.db")
     port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
-    # app.run(port=port, debug=True)
+    #app.run(host='0.0.0.0', port=port)
+    app.run(port=port, debug=True)
 
 
 if __name__ == '__main__':
