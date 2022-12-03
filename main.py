@@ -7,7 +7,7 @@ from sqlalchemy import desc
 from data import db_session, call_resource
 from data.proposals import Proposal
 from data.users import User
-from forms.addcallform import AddCallForm
+from forms.addproposalform import AddProposalForm
 from forms.editcallform import EditCallForm
 from forms.edituserform import EditUserForm
 from forms.loginform import LoginForm
@@ -146,17 +146,17 @@ def index():  # main page
 @app.route('/add_proposal', methods=['GET', 'POST'])
 @login_required
 def add_proposal():  # new proposal
-    form = AddCallForm()
+    form = AddProposalForm()
     if form.validate_on_submit():
         db_sess = db_session.create_session()
-        call = Proposal()
-        call.message = form.message.data
-        call.address = form.address.data
-        call.recognize_call()
-        db_sess.add(call)
+        proposal = Proposal()
+        proposal.type = form.type.data
+        proposal.file = form.file.data
+        proposal.recognize_call()
+        db_sess.add(proposal)
         db_sess.commit()
-        return redirect('/calls')
-    return render_template('add_proposal.html', title='Новый вызов',
+        return redirect('/proposals')
+    return render_template('add_proposal.html', title='Новая заявка',
                            form=form)
 
 
