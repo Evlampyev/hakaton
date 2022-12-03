@@ -17,35 +17,29 @@
 <h2 align="center">Оцененые заявки</h2>
 <br>
 <div class="table_container">
-    <table class="my_table">
+    <table class="table table-striped table-hover">
         <tr class="my_row">
-            <td class="title" width="2%" bgcolor="#dddddd" align="center">Id</td>
-            <td class="title" width="5%" bgcolor="#dddddd" align="center">Тип работы</td>
-            <td class="title" width="25%" bgcolor="#dddddd" align="center">Ссылка на работу</td>
-            <td class="title" width="25%" bgcolor="#dddddd" align="center">Тема работы</td>
-            <td class="title" width="6%" bgcolor="#dddddd" align="center">Статус</td>
-            <td class="title" width="8%" bgcolor="#dddddd" align="center">Действие</td>
+            <td class="table-dark" width="2%" align="center">Id</td>
+            <td class="table-dark" width="5%" align="center">Тип работы</td>
+            <td class="table-dark" width="25%" align="center">Ссылка на работу</td>
+            <td class="table-dark" width="25%" align="center">Тема работы</td>
+            <td class="table-dark" width="6%" align="center">Статус</td>
+            <td class="table-dark" width="8%" align="center">Действие</td>
         </tr>
         {% for proposal in proposals %}
-            {% if proposal.status != "verified" %}
-                {%  set color = "#dc143c" %}
-                {% set text_color = "#FFF0F5" %}
-            {% else %}
-                {% set color = "#d0daed"  %}
-                {% set text_color = "ffffff" %}
-            {% endif %}
+
         <tr class="my_row">
             <td class="ordinary" bgcolor ={{color}} align="center" style="color:{{text_color}}">{{ proposal.id }}</td>
             <td class="ordinary" bgcolor ={{color}} style="color:{{text_color}}">{{ TYPES[proposal.type] }}</td>
-            <td class="ordinary" bgcolor ={{color}} style="color:{{text_color}}"><a href="{{proposal.file}}">{{ proposal.file }}</a></td>
+            <td  ><a class="anchor" href="{{proposal.file}}">{{ proposal.file }}</a></td>
             <td class="ordinary" bgcolor ={{color}} style="color:{{text_color}}">{{ proposal.theme }}</td>
             <td class="ordinary" bgcolor ={{color}} align="center" style="color:{{text_color}}">{{ STATUSES[proposal.status] }}</td>
-            <td class="ordinary" bgcolor ={{color}} align="center" style="color:{{text_color}}">
+            <td class="ordinary" align="center">
                 {% if proposal.status == 'verified'%}
-                <div>       <a href="/proposals/view/{{ proposal.id }}" class="btn btn-warning">Посмотреть результаты</a>
+                <div>       <a href="/proposals/view/{{ proposal.id }}"  class="btn">Посмотреть результаты</a>
                 </div>
                 {% elif current_user.is_authenticated %}
-                <div>       <a href="/proposals/rate/{{ proposal.id }}" class="btn btn-warning">Оценить работу</a>
+                <div>       <a href="/proposals/rate/{{ proposal.id }}"  class="btn">Оценить работу</a>
                 </div>
                 {% endif %}
             </td>

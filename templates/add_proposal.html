@@ -6,7 +6,7 @@
     {{ form.hidden_tag() }}
     <p>
         {{ form.fullname.label }}<br>
-        {{ form.fullname(class="form-control") }}<br>
+        {{ form.fullname(class="form-control") }}</br>
         {% for error in form.fullname.errors %}
             <p class="alert alert-danger" role="alert">
                 {{ error }}

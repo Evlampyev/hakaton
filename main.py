@@ -6,7 +6,7 @@ from flask import Flask, render_template, redirect, request, abort, jsonify
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from sqlalchemy import desc
 
-from data import db_session, call_resource
+from data import db_session
 from data.proposals import Proposal
 from data.users import User
 from forms.addproposalform import AddProposalForm
