@@ -9,7 +9,7 @@ from data.proposals import Proposal
 from data.users import User
 from forms.addcallform import AddCallForm
 from forms.editcallform import EditCallForm
-
+from tables import user_data_empty
 from forms.loginform import LoginForm
 
 
@@ -79,7 +79,7 @@ def index():  # main page
 @app.route('/add_proposal', methods=['GET', 'POST'])
 @login_required
 def add_proposal():  # new proposal
-    form = None  # Витина форма (Не работает)
+    form = add_proposal()
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         proposal = Proposal()
