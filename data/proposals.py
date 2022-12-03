@@ -7,8 +7,8 @@ from .db_session import SqlAlchemyBase
 from tables import evaluation_table_video_default, evaluation_table_text_default, lowering_criteria_default
 
 
-class Purpose(SqlAlchemyBase, UserMixin, SerializerMixin):
-    __tablename__ = 'purposes'
+class Proposal(SqlAlchemyBase, UserMixin, SerializerMixin):
+    __tablename__ = 'proposal'
 
     id = sqlalchemy.Column(sqlalchemy.Integer,
                            primary_key=True, autoincrement=True)
@@ -17,6 +17,8 @@ class Purpose(SqlAlchemyBase, UserMixin, SerializerMixin):
     evaluation = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     lowering_criteria = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     status = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    likes = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
+    user_data = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
 
     @property
     def evaluation_dict(self):
@@ -24,11 +26,16 @@ class Purpose(SqlAlchemyBase, UserMixin, SerializerMixin):
         return json.loads(self.evaluation)
 
     @property
+    def user_data_dict(self):
+        """Возвращает личные данные пользователя"""
+        return json.loads(self.user_data)
+
+    @property
     def lowering_criteria_dict(self):
         """Возвращает словарь параметров понижения оценки"""
         return json.loads(self.lowering_criteria)
 
-    def verify_purpose(
+    def verify_proposal(
             self,
             new_evaluation: dict,
             new_lowering_criteria: dict,
@@ -43,16 +50,18 @@ class Purpose(SqlAlchemyBase, UserMixin, SerializerMixin):
         self.change_lowering_criteria(new_lowering_criteria)
         self.change_status(new_status)
 
-    def make_purpose(
+    def make_proposal(
             self,
             id: int,
             type: str,
-            file=None):
+            file: str,
+            user_data: dict):
         """
         Заполняет новую заявку дефолтными значениями
         :param id Id заявки
         :param type тип заявки (text or video)
         :param file прикрепленный файл заявки
+        :param user_data личные данные пользователя
         """
         self.id = id
         self.type = type
@@ -63,6 +72,8 @@ class Purpose(SqlAlchemyBase, UserMixin, SerializerMixin):
             self.evaluation = json.dumps(evaluation_table_video_default)
         self.lowering_criteria = json.dumps(lowering_criteria_default)
         self.status = "waiting_verification"
+        self.likes = 0
+        self.user_data = json.dumps(user_data)
 
     def change_evaluation(self, new_evaluation: dict):
         """
