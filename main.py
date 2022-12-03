@@ -7,7 +7,6 @@ from sqlalchemy import desc
 from data import db_session, call_resource
 from data.proposals import Proposal
 from data.users import User
-from forms.addcallform import AddCallForm
 from forms.editcallform import EditCallForm
 from tables import user_data_empty
 from forms.loginform import LoginForm
