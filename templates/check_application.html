@@ -4,100 +4,100 @@
 <h1>Оценка работы экспертом</h1>
 <form action="" method="post">
     {{ form.hidden_tag() }}
-    {% if proposal.type == "text" %}
+    {% if "text" == "text" %}
         <h2>Параметры оценивания текста</h2>
         <p>
-            {{ form.relevance.label }}<br>
-            {{ form.relevance(class="form-control") }}<br>
+            {{ form.relevance.label }}<a>
+            {{ form.relevance(class="form-control") }}</a>
 
         </p>
         <p>
-            {{ form.integrity.label }}<br>
-            {{ form.integrity(class="form-control") }}<br>
+            {{ form.integrity.label }}<a>
+            {{ form.integrity(class="form-control") }}</a>
 
         </p>
         <p>
-            {{ form.validity.label }}<br>
-            {{ form.validity(class="form-control") }}<br>
+            {{ form.validity.label }}<a>
+            {{ form.validity(class="form-control") }}</a>
 
         </p>
         <p>
-            {{ form.resonance.label }}<br>
-            {{ form.resonance(class="form-control") }}<br>
+            {{ form.resonance.label }}<a>
+            {{ form.resonance(class="form-control") }}</a>
 
         </p>
         <p>
-            {{ form.accuracy.label }}<br>
-            {{ form.accuracy(class="form-control") }}<br>
+            {{ form.accuracy.label }}<a>
+            {{ form.accuracy(class="form-control") }}</a>
 
         </p>
         <p>
-            {{ form.ethnicity.label }}<br>
-            {{ form.ethnicity(class="form-control") }}<br>
+            {{ form.ethnicity.label }}<a>
+            {{ form.ethnicity(class="form-control") }}</a>
 
         </p>
         <p>
-            {{ form.availability.label }}<br>
-            {{ form.availability(class="form-control") }}<br>
+            {{ form.availability.label }}<a>
+            {{ form.availability(class="form-control") }}</a>
 
         </p>
         <p>
-            {{ form.materials_cycle.label }}<br>
-            {{ form.materials_cycle(class="form-control") }}<br>
+            {{ form.materials_cycle.label }}<a>
+            {{ form.materials_cycle(class="form-control") }}</a>
 
         </p>
     {% else %}
         <h2>Параметры оценивания видео</h2>
         <p>
-            {{ form.expression_of_thought.label }}<br>
-            {{ form.expression_of_thought(class="form-control") }}<br>
+            {{ form.expression_of_thought.label }}<a>
+            {{ form.expression_of_thought(class="form-control") }}</a>
 
         </p>
         <p>
-            {{ form.integrity.label }}<br>
-            {{ form.integrity(class="form-control") }}<br>
+            {{ form.integrity.label }}<a>
+            {{ form.integrity(class="form-control") }}</a>
 
         </p>
         <p>
-            {{ form.personalized_character.label }}<br>
-            {{ form.personalized_character(class="form-control") }}<br>
+            {{ form.personalized_character.label }}<a>
+            {{ form.personalized_character(class="form-control") }}</a>
 
         </p>
         <p>
-            {{ form.artistic_techniques.label }}<br>
-            {{ form.artistic_techniques(class="form-control") }}<br>
+            {{ form.artistic_techniques.label }}<a>
+            {{ form.artistic_techniques(class="form-control") }}</a>
 
         </p>
         <p>
-            {{ form.operators_work.label }}<br>
-            {{ form.operators_work(class="form-control") }}<br>
+            {{ form.operators_work.label }}<a>
+            {{ form.operators_work(class="form-control") }}</a>
 
         </p>
     {% endif %}
     <h2>Параметры понижения оценки</h2>
     <p>
-        {{ form.promotional_materials.label }}<br>
-        {{ form.promotional_materials(class="form-control") }}<br>
+        {{ form.promotional_materials.label }}<a>
+        {{ form.promotional_materials(class="form-control") }}</a>
 
     </p>
     <p>
-        {{ form.journalistic_stamps.label }}<br>
-        {{ form.journalistic_stamps(class="form-control") }}<br>
+        {{ form.journalistic_stamps.label }}<a>
+        {{ form.journalistic_stamps(class="form-control") }}</a>
 
     </p>
     <p>
-        {{ form.сustom_nature.label }}<br>
-        {{ form.сustom_nature(class="form-control") }}<br>
+        {{ form.сustom_nature.label }}<a>
+        {{ form.сustom_nature(class="form-control") }}</a>
 
     </p>
     <p>
-        {{ form.grammatical_errors.label }}<br>
-        {{ form.grammatical_errors(class="form-control") }}<br>
+        {{ form.grammatical_errors.label }}<a>
+        {{ form.grammatical_errors(class="form-control") }}</a>
 
     </p>
     <p>
-        {{ form.orthoepic_norms.label }}<br>
-        {{ form.orthoepic_norms(class="form-control") }}<br>
+        {{ form.orthoepic_norms.label }}<a>
+        {{ form.orthoepic_norms(class="form-control") }}</a>
 
     </p>
 
