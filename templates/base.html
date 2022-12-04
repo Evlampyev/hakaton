@@ -13,15 +13,18 @@
   <body>
     <header>
       <nav class="navbar navbar-light bg-#000000">
-          <h1 style="color:#ffffff">ТВОРЧЕСКИЙ КОНКУРС ЖУРНАЛИСТОВ </h1>
+          <h1 style="color:#ffffff"><a class="navbar-link_MAIN" href="/">ТВОРЧЕСКИЙ КОНКУРС ЖУРНАЛИСТОВ</a> </h1>
 
           <a class="navbar-link" href="/proposals">Заявки</a>
           <a class="navbar-link" href="/add_proposal">Новая заявка</a>
 
 
+
           {% if current_user.is_authenticated %}
             <a style="color:#ffffff" class="Current_name" >{{current_user.name}} {{current_user.surname}}</a>
             <a class="navbar-link" href="/logout">Выход</a>
+          {% else %}
+            <a class="navbar-link" href="/login">Войти</a>
           {% endif %}
       </nav>
     </header>
